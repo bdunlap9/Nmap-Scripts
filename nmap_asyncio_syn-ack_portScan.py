@@ -7,11 +7,15 @@ class NmapScanner:
         self.ip = ip
         self.nm = nmap.PortScannerAsync()
 
+    async def callback_result(self, host, scan_result):
+        print('------------------')
+        print(host, scan_result)
+
     async def run(self):
         await asyncio.sleep(1)
 
         print(f"Starting scan on IP address {self.ip}")
-        self.nm.scan(self.ip, arguments=f"-v -sS -Pn -p- -sV -g 53", callback=callback_result)
+        self.nm.scan(self.ip, arguments=f"-v -sS -Pn -p- -sV -g 53", callback=self.callback_result)
         while self.nm.still_scanning():
             print('Finishing scan!')
 
