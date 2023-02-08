@@ -7,12 +7,24 @@ class NmapScanner:
 
     async def run(self):
         await asyncio.sleep(1)
-        
-        sTarget = input('Target: ')
 
-        self.nm.scan(self.ip, arguments=f"-sS -Pn -p- -g 53 {sTarget}")
+        print(f"Starting scan on IP address {self.ip}")
+        self.nm.scan(self.ip, arguments=f"-v -sS -Pn -p- -sV -g 53")
+
+        print(f"""Scan completed for IP address {self.ip}
+              Host: {self.nm[self.ip].hostname()}
+              OS details: {self.nm[self.ip].os_fingerprint()}""")
+
+        print('Open ports:')
         for port in self.nm[self.ip].all_tcp():
-            print("Port {} is {}".format(port, self.nm[self.ip]['tcp'][port]['state']))
+            print(f"Port {port} is {self.nm[self.ip]['tcp'][port]['state']}")
+            if self.nm[self.ip].has_tcp(port):
+                service = self.nm[self.ip]['tcp'][port]['name']
+                product = self.nm[self.ip]['tcp'][port]['product']
+                version = self.nm[self.ip]['tcp'][port]['version']
+                print(f"""Service: {service}
+                      Product: {product}
+                      Version: {version}\n""")
 
 async def main():
     ip = input(str(f'Target: '))
