@@ -3,8 +3,9 @@
 import asyncio, nmap
 
 class NmapScanner:
-    def __init__(self, ip):
+    def __init__(self, ip, output):
         self.ip = ip
+        self.output = output
         self.nm = nmap.PortScannerAsync()
 
     async def callback_result(self, host, scan_result):
@@ -15,7 +16,7 @@ class NmapScanner:
         await asyncio.sleep(1)
 
         print(f"Starting scan on IP address {self.ip}")
-        self.nm.scan(self.ip, arguments=f"-v -sS -Pn -p- -sV -g 53", callback=self.callback_result)
+        self.nm.scan(self.ip, arguments=f"-v -sS -Pn -p- -sV -g 53 -o {self.output}", callback=self.callback_result)
         while self.nm.still_scanning():
             print('Finishing scan!')
 
@@ -32,8 +33,10 @@ class NmapScanner:
                       Version: {self.nm[self.ip]['tcp'][port]['version']}\n""")
 
 async def main():
-    ip = input(str(f'Target: '))
-    scanner = NmapScanner(ip)
+    ip = input(str('Target: '))
+    output = (input(str('Save results to: ')))
+
+    scanner = NmapScanner(ip, output)
     await scanner.run()
 
 if __name__ == '__main__':
